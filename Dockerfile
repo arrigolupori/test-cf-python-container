@@ -1,24 +1,18 @@
-# syntax=docker/dockerfile:1
+# Use Python slim image
+FROM python:3.12-slim
 
-FROM golang:1.24-alpine AS build
-
-# Set destination for COPY
+# Set working directory
 WORKDIR /app
 
-# Download any Go modules
-COPY container_src/go.mod ./
-RUN go mod download
+# Copy and install dependencies
+COPY container_src/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy container source code
-COPY container_src/*.go ./
+# Copy application code
+COPY container_src/main.py .
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /server
-
-FROM scratch
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /server /server
+# The port must match what's in your Worker code (8080)
 EXPOSE 8080
 
-# Run
-CMD ["/server"]
+# Run the FastAPI app with Uvicorn on port 8080
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

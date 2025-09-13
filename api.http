@@ -1,0 +1,8 @@
+### Start a container for each ID with a 2m timeout
+GET {{BASE_URL}}/container/9cacc7100fd252661d200ea7651260c9efae31787f176f079319d198d7bb9c1e
+
+### Load balance requests over multiple containers
+GET {{BASE_URL}}/lb
+
+### Get a single specific container instance
+GET {{BASE_URL}}/singleton

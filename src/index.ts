@@ -1,7 +1,7 @@
 import { Container, getContainer, getRandom } from "@cloudflare/containers";
 import { Hono } from "hono";
 
-export class MyContainer extends Container<Env> {
+export class PythonTestContainer extends Container<Env> {
   // Port the container listens on (default: 8080)
   defaultPort = 8080;
   // Time before container sleeps due to inactivity (default: 30s)
@@ -44,26 +44,26 @@ app.get("/", (c) => {
 // Route requests to a specific container using the container ID
 app.get("/container/:id", async (c) => {
   const id = c.req.param("id");
-  const containerId = c.env.MY_CONTAINER.idFromName(`/container/${id}`);
-  const container = c.env.MY_CONTAINER.get(containerId);
+  const containerId = c.env.PYTHON_TEST_CONTAINER.idFromName(`/container/${id}`);
+  const container = c.env.PYTHON_TEST_CONTAINER.get(containerId);
   return await container.fetch(c.req.raw);
 });
 
 // Demonstrate error handling - this route forces a panic in the container
 app.get("/error", async (c) => {
-  const container = getContainer(c.env.MY_CONTAINER, "error-test");
+  const container = getContainer(c.env.PYTHON_TEST_CONTAINER, "error-test");
   return await container.fetch(c.req.raw);
 });
 
 // Load balance requests across multiple containers
 app.get("/lb", async (c) => {
-  const container = await getRandom(c.env.MY_CONTAINER, 3);
+  const container = await getRandom(c.env.PYTHON_TEST_CONTAINER, 3);
   return await container.fetch(c.req.raw);
 });
 
 // Get a single container instance (singleton pattern)
 app.get("/singleton", async (c) => {
-  const container = getContainer(c.env.MY_CONTAINER);
+  const container = getContainer(c.env.PYTHON_TEST_CONTAINER);
   return await container.fetch(c.req.raw);
 });
 
